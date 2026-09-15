@@ -49,6 +49,10 @@ public struct ByteWriter: Sendable {
         writeU64(UInt64(bitPattern: value), endian: endian)
     }
 
+    public mutating func writeBytes(_ source: [UInt8]) {
+        bytes.append(contentsOf: source)
+    }
+
     public mutating func writeBytes(_ source: Span<UInt8>) {
         for index in source.indices {
             bytes.append(source[index])

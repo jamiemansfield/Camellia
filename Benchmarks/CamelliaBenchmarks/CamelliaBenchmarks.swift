@@ -8,6 +8,9 @@ private let u64Count = byteCount / MemoryLayout<UInt64>.size
 private let input = (0..<byteCount).map { index in
     UInt8(truncatingIfNeeded: index &* 31 &+ 17)
 }
+private let input16 = Array(input.prefix(16))
+private let input256 = Array(input.prefix(256))
+private let input4096 = Array(input.prefix(4096))
 
 let benchmarks: @Sendable () -> Void = {
     Benchmark("ByteReader.readU8 (1 MiB)") { benchmark in
@@ -212,10 +215,109 @@ let benchmarks: @Sendable () -> Void = {
         }
     }
 
-    Benchmark("ByteWriter.writeBytes (1 MiB)") { benchmark in
+    Benchmark("ByteWriter.writeBytes single reserved (1 MiB)") { benchmark in
         for _ in benchmark.scaledIterations {
             var writer = ByteWriter(initialCapacity: byteCount)
             writer.writeBytes(input.span)
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes single growing (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter()
+            writer.writeBytes(input.span)
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes chunks of 16 reserved (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter(initialCapacity: byteCount)
+
+            for _ in 0..<(byteCount / input16.count) {
+                writer.writeBytes(input16.span)
+            }
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes chunks of 256 reserved (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter(initialCapacity: byteCount)
+
+            for _ in 0..<(byteCount / input256.count) {
+                writer.writeBytes(input256.span)
+            }
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes chunks of 4096 reserved (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter(initialCapacity: byteCount)
+
+            for _ in 0..<(byteCount / input4096.count) {
+                writer.writeBytes(input4096.span)
+            }
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes Array single reserved (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter(initialCapacity: byteCount)
+            writer.writeBytes(input)
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes Array single growing (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter()
+            writer.writeBytes(input)
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes Array chunks of 16 reserved (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter(initialCapacity: byteCount)
+
+            for _ in 0..<(byteCount / input16.count) {
+                writer.writeBytes(input16)
+            }
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes Array chunks of 256 reserved (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter(initialCapacity: byteCount)
+
+            for _ in 0..<(byteCount / input256.count) {
+                writer.writeBytes(input256)
+            }
+
+            blackHole(writer.bytes)
+        }
+    }
+
+    Benchmark("ByteWriter.writeBytes Array chunks of 4096 reserved (1 MiB)") { benchmark in
+        for _ in benchmark.scaledIterations {
+            var writer = ByteWriter(initialCapacity: byteCount)
+
+            for _ in 0..<(byteCount / input4096.count) {
+                writer.writeBytes(input4096)
+            }
 
             blackHole(writer.bytes)
         }
