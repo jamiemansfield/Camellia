@@ -12,6 +12,11 @@ public struct ByteWriter: Sendable {
         bytes.reserveCapacity(initialCapacity)
     }
 
+    public mutating func reserveCapacity(_ minimumCapacity: Int) {
+        precondition(minimumCapacity >= 0)
+        bytes.reserveCapacity(minimumCapacity)
+    }
+
     public mutating func writeU8(_ value: UInt8) {
         bytes.append(value)
     }
@@ -45,8 +50,6 @@ public struct ByteWriter: Sendable {
     }
 
     public mutating func writeBytes(_ source: Span<UInt8>) {
-        bytes.reserveCapacity(bytes.count + source.count)
-
         for index in source.indices {
             bytes.append(source[index])
         }
@@ -57,7 +60,6 @@ public struct ByteWriter: Sendable {
         endian: Endianness
     ) {
         let byteCount = MemoryLayout<T>.size
-        bytes.reserveCapacity(bytes.count + byteCount)
 
         switch endian {
         case .little:
