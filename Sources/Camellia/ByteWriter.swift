@@ -54,8 +54,8 @@ public struct ByteWriter: Sendable {
     }
 
     public mutating func writeBytes(_ source: Span<UInt8>) {
-        for index in source.indices {
-            bytes.append(source[index])
+        source.withUnsafeBufferPointer { buffer in
+            bytes.append(contentsOf: buffer)
         }
     }
 
