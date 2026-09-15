@@ -1,6 +1,6 @@
 public struct ByteReader: ~Escapable {
-    private let bytes: Span<UInt8>
-    public private(set) var index = 0
+    let bytes: Span<UInt8>
+    public internal(set) var index = 0
 
     @_lifetime(copy source)
     public init(_ source: Span<UInt8>) {

@@ -233,3 +233,36 @@ import Testing
         _ = try reader.slice(1..<4)
     }
 }
+
+@Test func readsUTF8AndConsumesBytes() throws {
+    let bytes = Array("hello, 🌍".utf8)
+    var reader = ByteReader(bytes.span)
+
+    #expect(try reader.readUTF8(count: bytes.count) == "hello, 🌍")
+    let reachedEnd = reader.isAtEnd
+    #expect(reachedEnd)
+}
+
+@Test func matchesAndConsumesUTF8WithoutAdvancingOnFailure() {
+    let bytes = Array("FD payload".utf8)
+    var reader = ByteReader(bytes.span)
+
+    let matchedPrefix = reader.match("FD ")
+    #expect(matchedPrefix)
+    #expect(reader.index == 3)
+    let matchedWrong = reader.match("wrong")
+    #expect(!matchedWrong)
+    #expect(reader.index == 3)
+}
+
+@Test func expectsUTF8WithoutAdvancingOnMismatch() throws {
+    let bytes = Array("FD payload".utf8)
+    var reader = ByteReader(bytes.span)
+
+    try reader.expect("FD ")
+    #expect(reader.index == 3)
+    #expect(throws: ByteReaderError.byteMismatch(expected: 0x77, actual: 0x70)) {
+        try reader.expect("wrong")
+    }
+    #expect(reader.index == 3)
+}

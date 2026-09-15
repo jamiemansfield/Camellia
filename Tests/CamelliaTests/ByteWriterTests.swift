@@ -38,6 +38,31 @@ import Testing
     #expect(writer.bytes == [1, 2, 3, 4])
 }
 
+@Test func writerAcceptsArrayBytes() {
+    let source: [UInt8] = [2, 3, 4]
+    var writer = ByteWriter()
+    writer.writeU8(1)
+    writer.writeBytes(source)
+
+    #expect(writer.bytes == [1, 2, 3, 4])
+    #expect(source == [2, 3, 4])
+}
+
+@Test func writingEmptyArrayDoesNotChangeOutput() {
+    var writer = ByteWriter()
+    writer.writeU8(1)
+    writer.writeBytes([UInt8]())
+
+    #expect(writer.bytes == [1])
+}
+
+@Test func writesUTF8() {
+    var writer = ByteWriter()
+    writer.writeUTF8("hello, 🌍")
+
+    #expect(writer.bytes == Array("hello, 🌍".utf8))
+}
+
 @Test func writerOutputRoundTripsThroughReader() throws {
     var writer = ByteWriter()
     writer.writeU8(0xa5)

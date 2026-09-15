@@ -1,5 +1,5 @@
 public struct ByteWriter: Sendable {
-    public private(set) var bytes: [UInt8]
+    public internal(set) var bytes: [UInt8]
 
     public var count: Int {
         bytes.count
