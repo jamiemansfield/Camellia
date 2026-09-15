@@ -59,6 +59,7 @@ public struct ByteWriter: Sendable {
         }
     }
 
+    @inline(__always)
     private mutating func writeInteger<T: FixedWidthInteger>(
         _ value: T,
         endian: Endianness
